@@ -1,0 +1,12 @@
+First release of Linshom.
+
+• Three built-in breathing exercises: equal, box, and 4-7-8
+• Create your own custom breathing patterns
+• Nature ambience and a transition bell — bundled in the app, work offline
+• Hebrew voice guidance via your device's speech engine
+• Daily and weekly practice reminders
+• Breath-hold test with progress tracking
+• Full data export and import
+• Dark mode and complete Hebrew RTL support
+
+No ads, no subscriptions, no data collection.

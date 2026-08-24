@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F6ECE0">
+<link rel="icon" href="assets/logo.png">
+<title>לנשום</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@300;400;600;700&family=Heebo:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---- hero ---------------------------------------------------------- */
+  .hero{display:flex; flex-direction:column; align-items:center; gap:34px;
+        padding:clamp(40px,8vw,76px) 0 clamp(30px,5vw,50px); text-align:center}
+  .hero p{text-align:center}
+  .badge{width:clamp(132px,26vw,178px); height:auto; filter:drop-shadow(0 8px 22px var(--shadow))}
+  .title{font-size:var(--step-4); letter-spacing:-.01em}
+  .tagline{font-family:var(--f-display); font-size:var(--step-1); color:var(--teal); margin-top:-4px}
+  .lede{font-size:var(--step-1); color:var(--ink-soft); max-width:52ch; margin-inline:auto}
+
+  /* ---- the breathing widget: the app's core experience, live --------- */
+  .breath{display:flex; flex-direction:column; align-items:center; gap:20px; width:100%}
+  .stage{position:relative; width:min(320px,80vw); aspect-ratio:1; display:grid; place-items:center}
+  .stage canvas{position:absolute; inset:0; width:100%; height:100%}
+  .disc{
+    width:52%; aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, var(--teal-bright), var(--teal) 70%);
+    transform:scale(.44); will-change:transform;
+    box-shadow:0 10px 34px var(--shadow);
+  }
+  .readout{position:absolute; display:flex; flex-direction:column; align-items:center; gap:2px; pointer-events:none}
+  .phase{font-family:var(--f-display); font-size:var(--step-2); color:#FFF9F0; text-shadow:0 1px 10px rgba(0,0,0,.32)}
+  .count{font-family:var(--f-num); font-variant-numeric:tabular-nums; font-size:var(--step-0);
+         color:rgba(255,249,240,.82); text-shadow:0 1px 8px rgba(0,0,0,.3)}
+
+  .chips{display:flex; flex-wrap:wrap; gap:9px; justify-content:center}
+  .chip{
+    font-family:var(--f-body); font-size:var(--step--1); font-weight:600; color:var(--ink-soft);
+    background:transparent; border:1.5px solid var(--rule); border-radius:999px;
+    padding:8px 17px; cursor:pointer; transition:background .18s,color .18s,border-color .18s;
+  }
+  .chip:hover{border-color:var(--teal)}
+  .chip[aria-pressed="true"]{background:var(--teal); border-color:var(--teal); color:#FFF9F0}
+  .hint{font-size:var(--step--1); color:var(--muted)}
+
+  /* ---- sections ------------------------------------------------------ */
+  section{padding-block:clamp(44px,7vw,72px); border-top:1px solid var(--rule)}
+  .sec-head{margin-bottom:30px}
+  .sec-head h2{font-size:var(--step-3)}
+  .sec-head p{color:var(--ink-soft); margin-top:10px}
+
+  /* rhythm bars: proportions are the real phase durations -------------- */
+  .rhythms{display:flex; flex-direction:column; gap:26px}
+  .rhythm{display:grid; grid-template-columns:minmax(120px,auto) 1fr; gap:8px 20px; align-items:center}
+  .rhythm-name{font-family:var(--f-display); font-size:var(--step-1)}
+  .rhythm-note{grid-column:1; font-size:var(--step--1); color:var(--muted); line-height:1.4}
+  .bar{grid-column:2; grid-row:1 / span 2; display:flex; height:46px; border-radius:9px; overflow:hidden; background:var(--surface-2)}
+  .seg{display:grid; place-items:center; font-family:var(--f-num); font-variant-numeric:tabular-nums;
+       font-size:var(--step--1); font-weight:500; color:#FFF9F0; min-width:0}
+  .seg span{opacity:.95; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-inline:4px}
+  .seg.inhale{background:var(--teal)}
+  .seg.hold{background:color-mix(in srgb, var(--teal) 45%, var(--muted))}
+  .seg.exhale{background:color-mix(in srgb, var(--teal) 72%, #000 18%)}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:22px; font-size:var(--step--1); color:var(--muted)}
+  .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-inline-start:6px; vertical-align:-1px}
+
+  /* feature list ------------------------------------------------------- */
+  .features{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:2px; background:var(--rule);
+            border:1px solid var(--rule); border-radius:14px; overflow:hidden}
+  .feature{background:var(--surface); padding:24px 22px}
+  .feature h3{font-size:var(--step-1); margin-bottom:7px}
+  .feature p{font-size:var(--step--1); color:var(--ink-soft); line-height:1.62}
+
+  /* privacy ------------------------------------------------------------ */
+  .privacy{background:var(--teal-wash); border-radius:16px; padding:clamp(26px,5vw,40px)}
+  .privacy h2{font-size:var(--step-2); margin-bottom:12px}
+  .privacy p{color:var(--ink-soft)}
+  .facts{list-style:none; padding:0; margin:22px 0 0; display:grid; gap:11px}
+  .facts li{display:flex; gap:11px; align-items:baseline; font-size:var(--step--1); color:var(--ink-soft)}
+  .facts b{font-family:var(--f-num); font-weight:700; color:var(--teal); min-width:2.2em; text-align:center;
+           font-variant-numeric:tabular-nums}
+
+  .disclaimer{font-size:var(--step--1); color:var(--muted); border-inline-start:3px solid var(--rule);
+              padding-inline-start:18px; max-width:var(--measure)}
+  footer{padding-block:40px 56px; border-top:1px solid var(--rule); display:flex; flex-wrap:wrap;
+         gap:14px 26px; align-items:center; justify-content:space-between; font-size:var(--step--1); color:var(--muted)}
+  .soon{display:inline-flex; align-items:center; gap:9px; font-size:var(--step--1); font-weight:600;
+        color:var(--ink-soft); background:var(--surface); border:1px solid var(--rule);
+        border-radius:999px; padding:9px 19px}
+  .soon i{width:7px; height:7px; border-radius:50%; background:var(--teal-bright)}
+
+  @media (prefers-reduced-motion:reduce){ .disc{transition:none !important} }
+</style>
+
+
+<meta name="description" content="תרגול נשימה מודרך בעברית — נשימה שווה, נשימת קופסה ו-4-7-8. ללא פרסומות, ללא מנויים וללא איסוף נתונים.">
+</head>
+<body>
+<div class="wrap">
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="assets/logo.png" alt="">לנשום</a>
+  <ul>
+    <li><a href="index.html" aria-current="page">הבית</a></li>
+    <li><a href="support.html">תמיכה</a></li>
+    <li><a href="privacy-policy.html">פרטיות</a></li>
+  </ul>
+</nav>
+
+  <header class="hero">
+    <img class="badge" src="assets/logo.png" alt="הלוגו של לנשום" width="405" height="420">
+    <div>
+      <h1 class="title">לנשום</h1>
+      <p class="tagline">כי כל אחד יכול</p>
+    </div>
+    <p class="lede">תרגול נשימה מודרך, בעברית מלאה. מעגל אחד על המסך, קצב יציב, וכמה דקות לעצמך.</p>
+
+    <div class="breath">
+      <div class="stage">
+        <canvas id="halo" width="640" height="640" aria-hidden="true"></canvas>
+        <div class="disc" id="disc"></div>
+        <div class="readout"><div class="phase" id="phase">שאיפה</div><div class="count" id="count">4</div></div>
+      </div>
+      <div class="chips" role="group" aria-label="בחירת קצב נשימה">
+        <button class="chip" data-p="equal"  aria-pressed="false">נשימה שווה</button>
+        <button class="chip" data-p="box"    aria-pressed="true">נשימת קופסה</button>
+        <button class="chip" data-p="four78" aria-pressed="false">4-7-8</button>
+      </div>
+      <p class="hint">נסו לנשום יחד עם המעגל — זה בדיוק הקצב שבאפליקציה.</p>
+    </div>
+
+    <span class="soon"><i></i> בקרוב ב-Google Play</span>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">שלושת הקצבים</p>
+      <h2>כל תרגיל והמקצב שלו</h2>
+      <p>אורך כל שלב מוצג ביחס אמיתי — כך נראה מחזור נשימה אחד, בשניות.</p>
+    </div>
+
+    <div class="rhythms">
+      <div class="rhythm">
+        <div class="rhythm-name">נשימה שווה</div>
+        <div class="rhythm-note">איזון והרגעה · 8 שניות למחזור</div>
+        <div class="bar" role="img" aria-label="שאיפה 4 שניות, נשיפה 4 שניות">
+          <div class="seg inhale" style="flex:4"><span>שאיפה 4</span></div>
+          <div class="seg exhale" style="flex:4"><span>נשיפה 4</span></div>
+        </div>
+      </div>
+
+      <div class="rhythm">
+        <div class="rhythm-name">נשימת קופסה</div>
+        <div class="rhythm-note">ריכוז ומיקוד · 16 שניות למחזור</div>
+        <div class="bar" role="img" aria-label="שאיפה 4, החזקה 4, נשיפה 4, החזקה 4">
+          <div class="seg inhale" style="flex:4"><span>שאיפה 4</span></div>
+          <div class="seg hold"   style="flex:4"><span>החזקה 4</span></div>
+          <div class="seg exhale" style="flex:4"><span>נשיפה 4</span></div>
+          <div class="seg hold"   style="flex:4"><span>החזקה 4</span></div>
+        </div>
+      </div>
+
+      <div class="rhythm">
+        <div class="rhythm-name">4-7-8</div>
+        <div class="rhythm-note">הרפיה ושינה · 19 שניות למחזור</div>
+        <div class="bar" role="img" aria-label="שאיפה 4, החזקה 7, נשיפה 8">
+          <div class="seg inhale" style="flex:4"><span>שאיפה 4</span></div>
+          <div class="seg hold"   style="flex:7"><span>החזקה 7</span></div>
+          <div class="seg exhale" style="flex:8"><span>נשיפה 8</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:var(--teal)"></i>שאיפה</span>
+      <span><i style="background:color-mix(in srgb,var(--teal) 45%,var(--muted))"></i>החזקה</span>
+      <span><i style="background:color-mix(in srgb,var(--teal) 72%,#000 18%)"></i>נשיפה</span>
+      <span>ואפשר גם לבנות קצב משלכם.</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">מה יש בפנים</p>
+      <h2>הכול פתוח מהרגע הראשון</h2>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <h3>הנחיה קולית בעברית</h3>
+        <p>הקראה של שלבי הנשימה דרך מנוע הדיבור של המכשיר, בשני סוגי קול ובעוצמה שתבחרו. אפשר גם לתרגל בשקט מוחלט.</p>
+      </div>
+      <div class="feature">
+        <h3>צלילי טבע, ללא רשת</h3>
+        <p>גשם, ים ויער — ארוזים בתוך האפליקציה ומתנגנים גם במצב טיסה. ופעמון עדין בכל מעבר בין שלבים.</p>
+      </div>
+      <div class="feature">
+        <h3>רטט מותאם</h3>
+        <p>משוב רטט בארבע עוצמות בכל מעבר שלב, כדי לתרגל גם בעיניים עצומות.</p>
+      </div>
+      <div class="feature">
+        <h3>תזכורות</h3>
+        <p>תזכורת יומית או שבועית, בשעה ובימים שנוחים לכם, לתרגיל שתבחרו.</p>
+      </div>
+      <div class="feature">
+        <h3>מבחן החזקת נשימה</h3>
+        <p>מדידת זמן ההחזקה ומעקב אחרי השיפור לאורך זמן, לצד היסטוריית האימונים.</p>
+      </div>
+      <div class="feature">
+        <h3>הנתונים שלכם, שלכם</h3>
+        <p>ייצוא כל ההיסטוריה לקובץ וייבוא חזרה — כדי להחליף מכשיר בלי לאבד דבר.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="privacy">
+      <p class="eyebrow">פרטיות</p>
+      <h2>האפליקציה לא מדברת עם אף אחד</h2>
+      <p>לא בגלל שאנחנו מבטיחים — אלא כי אין לה למי. אין קוד שפונה לאינטרנט, אין חשבון משתמש, אין פרסומות ואין כלי מעקב.</p>
+      <ul class="facts">
+        <li><b>0</b> פניות רשת שהאפליקציה מבצעת</li>
+        <li><b>0</b> נתונים שנשלחים ממכשיר שלכם</li>
+        <li><b>0</b> ספריות פרסום או אנליטיקה</li>
+        <li><b>7</b> הרשאות בלבד — כולן רגילות, אף אחת לא מסוכנת</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">חשוב לדעת</p>
+    <p class="disclaimer">
+      האפליקציה מיועדת לתרגול הרפיה ורווחה כללית בלבד. היא אינה מכשיר רפואי ואינה תחליף לייעוץ,
+      אבחון או טיפול רפואי. אם אתם חשים סחרחורת, קוצר נשימה, כאב או מצוקה — הפסיקו מיד.
+      אם אתם בהיריון, סובלים ממחלת לב, מאסתמה, מלחץ דם לא מאוזן או מכל מצב רפואי אחר —
+      היוועצו ברופא לפני תרגילי נשימה.
+    </p>
+  </section>
+
+  <footer>
+    <span>לנשום · כי כל אחד יכול</span>
+    <span><a href="support.html">תמיכה</a> · <a href="privacy-policy.html">מדיניות פרטיות</a></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var PATTERNS = {
+    equal:  [['inhale',4],['exhale',4]],
+    box:    [['inhale',4],['hold_in',4],['exhale',4],['hold_out',4]],
+    four78: [['inhale',4],['hold_in',7],['exhale',8]]
+  };
+  var LABEL = {inhale:'שאיפה', hold_in:'החזקה', exhale:'נשיפה', hold_out:'החזקה'};
+  var disc  = document.getElementById('disc'),
+      phase = document.getElementById('phase'),
+      count = document.getElementById('count'),
+      chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var current = 'box', idx = 0, phaseStart = performance.now();
+
+  /* Halftone halo — the dot ring lifted straight off the badge. */
+  var cv = document.getElementById('halo'), cx = cv.getContext('2d');
+  function halo(pulse){
+    var S = cv.width, c = S/2, N = 46, R = S*0.435;
+    cx.clearRect(0,0,S,S);
+    var col = getComputedStyle(document.body).getPropertyValue('--ink').trim();
+    for(var i=0;i<N;i++){
+      var a = (i/N)*Math.PI*2 - Math.PI/2;
+      var big = i%2===0;
+      var r = (big?7.5:4.2) * (1 + pulse*(big?0.5:0.3));
+      cx.globalAlpha = (big?0.5:0.3) * (0.62 + pulse*0.38);
+      cx.beginPath();
+      cx.arc(c + R*Math.cos(a), c + R*Math.sin(a), r, 0, Math.PI*2);
+      cx.fillStyle = col; cx.fill();
+    }
+    cx.globalAlpha = 1;
+  }
+
+  function scaleFor(kind, t){
+    /* 0.44 at rest, 1.0 at full — the same shape the app's circle uses. */
+    if(kind==='inhale')  return 0.44 + 0.56*t;
+    if(kind==='exhale')  return 1.00 - 0.56*t;
+    if(kind==='hold_in') return 1.00;
+    return 0.44;
+  }
+
+  function frame(now){
+    var seq = PATTERNS[current], step = seq[idx], dur = step[1]*1000;
+    var t = Math.min((now - phaseStart)/dur, 1);
+    if(t >= 1){ idx = (idx+1) % seq.length; phaseStart = now; step = seq[idx]; t = 0; }
+
+    var s = scaleFor(step[0], t);
+    disc.style.transform = 'scale(' + s.toFixed(4) + ')';
+    phase.textContent = LABEL[step[0]];
+    count.textContent = Math.max(1, Math.ceil((1-t) * step[1]));
+    halo((s - 0.44)/0.56);
+    requestAnimationFrame(frame);
+  }
+
+  function select(p){
+    current = p; idx = 0; phaseStart = performance.now();
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', String(c.dataset.p === p)); });
+  }
+  chips.forEach(function(c){ c.addEventListener('click', function(){ select(c.dataset.p); }); });
+
+  if(reduce){
+    disc.style.transform = 'scale(0.82)';
+    phase.textContent = 'שאיפה'; count.textContent = '4';
+    halo(0.6);
+  } else {
+    requestAnimationFrame(frame);
+  }
+  /* Repaint the halo when the viewer's theme flips, so it stays legible. */
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ halo(0.5); });
+})();
+</script>
+</body>
+</html>
